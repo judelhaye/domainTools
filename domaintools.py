@@ -4,15 +4,22 @@
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from contextlib import closing
+import socket
 
 
-# configuration
-DEBUG = True
-SECRET_KEY = 'development key'
-
-# create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
+
+DEBUG=True
+
+#
+def get_cluster_ips(cluster):
+    ips = {}
+    ips["directe sans cache"] = socket.gethostbyname('direct.{}.ovh.net'.format(cluster)) 
+    ips["ip classique"] = socket.gethostbyname('{}.ovh.net'.format(cluster)) 
+    ips["CDN 3 POP"] = socket.gethostbyname('basic-cdn-01.{}.ovh.net'.format(cluster)) 
+    ips["CDN 17 POP"] = socket.gethostbyname('full-cdn-01.{}.ovh.net'.format(cluster)) 
+    return ips 
 
 @app.route("/")
 def index():
@@ -39,9 +46,21 @@ def zonecheck():
 def propadns():
     return render_template('propadns.html')
 
-@app.route('/getip')
+@app.route('/getip', methods=['GET', 'POST'])
 def getip():
-    return render_template('getip.html')
+    ips={}
+    if request.method == 'POST':
+        cluster = request.form['cluster']
+        ips = get_cluster_ips(cluster.split("-")[0].strip())
+        datas = { 
+            'cluster': cluster,
+            'ips': ips,
+        }   
+
+    else:
+        context={}
+
+    return render_template('getip.html', ips=ips, cluster=cluster)
 
 @app.route('/sortdom')
 def sortdom():
@@ -50,5 +69,5 @@ def sortdom():
     
 
 if __name__=="__main__":
-    app.run()
+    app.run(host='0.0.0.0')
 
