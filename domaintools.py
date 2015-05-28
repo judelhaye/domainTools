@@ -12,7 +12,7 @@ app.config.from_object(__name__)
 
 DEBUG=True
 
-#
+
 def get_cluster_ips(cluster):
     ips = {}
     ips["directe sans cache"] = socket.gethostbyname('direct.{}.ovh.net'.format(cluster)) 
@@ -62,10 +62,28 @@ def getip():
 
     return render_template('getip.html', ips=ips, cluster=cluster)
 
-@app.route('/sortdom')
+@app.route('/sortdom', methods=['GET', 'POST'])
 def sortdom():
-    return render_template('sortdom.html')
-    
+    sorted_doms = {}
+    if request.method == 'POST':
+        doms = request.form['domains']
+        domains = doms.split("\r\n")
+        # get all domains and tlds in the file
+        extensions =[]
+        domains_list=[]
+        for domain in domains:
+            if "." not in domain:
+                #pas de point = pas de domaine = osef
+                continue
+            domain = domain.strip().decode('utf8').encode('idna')
+            domains_list.append(domain)
+            sorted_doms['.'.join(domain.split('.')[1:]).strip()] = []
+        for tld in sorted_doms.keys():
+            for dom in domains_list:
+                if ".".join(dom.split(".")[1:]) == tld :
+                    sorted_doms[tld].append(dom)
+    return render_template('sortdom.html', result=sorted_doms)
+
     
 
 if __name__=="__main__":

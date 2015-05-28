@@ -1,0 +1,23 @@
+{% extends "base.html"  %}
+{% block index %}
+
+<form  action="{{ url_for("sortdom") }}" method="post"> 
+    <textarea rows="10" cols="80" name=domains></textarea>
+    <br/>
+    <input type="submit" value="Trier">
+</form>
+<hr />
+
+{% if result %}
+    {% for ext, dom in result.iteritems()  %}
+        <h3>{{ ext }}</h3>
+        <ul>
+        {% for d in dom  %}
+        <li>{{ d }}</li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+{% endif %}
+
+{% endblock %}
+
