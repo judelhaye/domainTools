@@ -5,7 +5,7 @@ from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from contextlib import closing
 import socket
-
+import subprocess
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -42,9 +42,45 @@ def whois_dig():
 def zonecheck():
     return render_template('zonecheck.html')
     
-@app.route('/propadns')
+@app.route('/propadns', methods=['GET', 'POST'])
 def propadns():
-    return render_template('propadns.html')
+    context = {}
+    res=[]
+    domain=""
+    if request.method == 'POST':
+        context['res'] = []
+        domain = request.form['domain'].strip().encode('idna')
+        context['domain'] = domain
+        servers = [ 
+            {"ip":"8.8.8.8", "localisation":"google (US)"},
+            {"ip":"208.67.222.222", "localisation":"openDNS (US)"},
+            {"ip":"8.26.56.26", "localisation":"comodo (US)"},
+            {"ip":"156.154.70.1", "localisation":"DNS advantage (US)"},
+            {"ip":"198.153.192.50", "localisation":"norton DNS (US)"},
+            {"ip":"109.69.8.51", "localisation":"puntCAT (espagne)"},
+            {"ip":"89.233.43.71", "localisation":"censurfridns.dk (danemark) "},
+            {"ip":"37.235.1.174", "localisation":"FreeDNS (autriche)"},
+            {"ip":"195.46.39.39", "localisation":"SafeDNS (Russie)"},
+            {"ip":"81.218.119.11", "localisation":"GreenTeamDNS (israel)"},
+            {"ip":"84.200.69.80", "localisation":"DNS.WATCH (Allemagne)"},
+            {"ip":"187.115.169.179","localisation":"Bresil"},
+            {"ip":"211.22.80.180","localisation":"taiwan"},
+        ]   
+        for server in servers:
+            if "ns_check" in request.form.keys():
+                p = subprocess.Popen(["dig", domain, "NS", "@{}".format(server["ip"]), "+short"], stdout=subprocess.PIPE)
+                result =  p.communicate()[0][:-1]
+                ns = result.split("\n")
+                nss = sorted(ns)
+                result = " - ".join(nss)
+                res.append("servers : {1} at {0} ".format(server["localisation"], result))
+            else :
+                p = subprocess.Popen(["dig", domain, "@{}".format(server["ip"]), "+short"], stdout=subprocess.PIPE)
+                result =  p.communicate()[0][:-1]
+                res.append("servers : {1} at {0} ".format(server["localisation"], result))
+
+    return render_template('propadns.html', res=res, domain=domain)
+
 
 @app.route('/getip', methods=['GET', 'POST'])
 def getip():

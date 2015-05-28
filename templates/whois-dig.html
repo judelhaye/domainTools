@@ -1,0 +1,92 @@
+{% extends "base.html"  %}
+{% block index %}
+{% include 'header.html'  %}
+
+<script type="text/javascript">
+function valueChanged()
+{
+    var chbox = document.getElementById("trace");
+    var serv_field =  document.getElementById("server_field");
+    var selector = document.getElementById("selector");
+
+    if (chbox.checked){
+        serv_field.style.display = 'none';
+        selector.style.display = 'inline';
+    } else {
+        serv_field.style.display = 'block';
+        selector.style.display = 'none';
+    }
+}
+</script>
+<form  action="{{ url_for('whois-dig') }}" method="post"> 
+    domaine : <input type="text" name="domain">    <select name="field" id="selector" style="display:none;">
+    <option>A</option> 
+    <option>MX</option> 
+    <option>TXT</option> 
+    </select>
+    <br />
+<!--    dig autodiscover : <input type="checkbox" name="discover"> <br /> -->
+    option +trace <input type="checkbox" id="trace" name="trace" value="trace" onchange="valueChanged()"/>
+   <br />
+    <div id="server_field" >
+    dig sur un serveur précis : <input type="text" name="serveur"> <br /> 
+    </div>
+    <br />
+    <input type="submit" value="run">
+</form>
+<hr />
+
+{% if domain  %}
+    Resultats pour <strong>{{ domain  }} </strong> : 
+    <hr />
+{% endif%}
+
+{% if whois  %}
+    <h3>whois</h3>
+    <strong>registrar</strong> : {{ whois.registrar }}
+    <br />
+    <strong>owner</strong> : {{ whois.owner  }}
+    <br />
+    <strong>status</strong> : {{ whois.status  }}
+    <hr />
+{% endif %}
+
+{% if dig_to  %}
+    <strong>Dig A</strong> sur <strong>{{ serv  }}</strong> : {{ dig_to  }}
+    <hr />
+{% endif  %}
+
+{% if res  %}
+    {% if trace %}
+        <pre>
+        {{ res  }}
+        </pre>
+    {% else  %}
+        <h3>dig</h3>
+        <strong>A</strong> : {{ res.A  }} => {{ res.HOST }}
+        <br />
+        <strong> MX </strong>:
+        <ul>
+        {% for mx in res.MX %}
+            <li>{{ mx }} </li>
+        {% endfor %}
+        </ul>
+        {% if discover %}
+            <strong>autodiscover</strong> : {{ res.discover  }}
+            <br />
+        {% endif  %}
+        <strong>TXT</strong> :
+        {% for txt in res.TXT  %}
+        {{ txt  }}
+        {% endfor %}
+        <br />
+        <strong>NS </strong>:
+        <ul>
+        {% for ns in res.NS %}
+            <li>{{ ns }}</li>
+        {% endfor  %}
+        </ul>
+    {% endif %}
+{% endif  %}
+{% endblock %}
+
