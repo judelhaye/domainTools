@@ -1,0 +1,41 @@
+body {
+width:90%;
+margin: auto;
+font-family: "Helvetica","Arial";
+color: #333;
+background: #F0F0F0;
+}
+
+footer, a{
+color: #969696;    
+text-decoration: none;
+}
+
+h1 a{color: #333;}
+
+h3 a, 
+li a{
+color: #333;    
+/*border-bottom: 1px solid #646464;*/
+}
+
+header span{font-size: 0.4em;}
+
+nav li {display: inline;}
+
+a:hover {color: #646464;}
+
+.article {
+    padding:10px;
+    margin: 10px;
+    box-shadow: 5px 5px 5px #888888;
+    }
+
+table{border: 1px solid black;
+border-collapse:collapse;
+}
+td{
+    margin: 5px;
+    padding: 5px;
+   border: 1px solid black; 
+}
