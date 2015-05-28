@@ -10,9 +10,6 @@ import subprocess
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-DEBUG=True
-
-
 def get_cluster_ips(cluster):
     ips = {}
     ips["directe sans cache"] = socket.gethostbyname('direct.{}.ovh.net'.format(cluster)) 
@@ -38,9 +35,18 @@ def index():
 def whois_dig():
     return render_template('whois-dig.html')
 
-@app.route('/zonecheck')
+@app.route('/zonecheck', methods=['GET','POST'])
 def zonecheck():
-    return render_template('zonecheck.html')
+    domain=""
+    res=""
+    if request.method == 'POST':
+        domain = request.form['domain'].strip().encode('idna')
+    
+        p = subprocess.Popen(["zonemaster-cli", domain], stdout=subprocess.PIPE)
+        result =  p.communicate()[0][:-1]
+        res = result
+
+    return render_template('zonemaster.html', domain=domain, res=res)
     
 @app.route('/propadns', methods=['GET', 'POST'])
 def propadns():

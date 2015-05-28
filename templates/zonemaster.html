@@ -1,0 +1,21 @@
+{% extends "base.html"  %}
+{% block index %}
+
+<form  action="{{ url_for('zonecheck') }}" method="post"> 
+    domaine : <input type="text" name="domain">
+    <input type="submit" value="run">
+</form>
+<hr />
+
+{% if domain  %}
+    Resultats pour <strong>{{ domain  }} </strong> : 
+    <hr />
+{% endif%}
+{% if res %}
+<pre>
+{{ res }}
+</pre>
+{%endif%}
+Ce service se base sur <a href="https://github.com/dotse/zonemaster">zonemaster</a>
+{% endblock %}
+
