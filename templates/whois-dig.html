@@ -1,6 +1,5 @@
 {% extends "base.html"  %}
 {% block index %}
-{% include 'header.html'  %}
 
 <script type="text/javascript">
 function valueChanged()
@@ -18,7 +17,7 @@ function valueChanged()
     }
 }
 </script>
-<form  action="{{ url_for('whois-dig') }}" method="post"> 
+<form  action="{{ url_for('whois_dig') }}" method="post"> 
     domaine : <input type="text" name="domain">    <select name="field" id="selector" style="display:none;">
     <option>A</option> 
     <option>MX</option> 
@@ -28,9 +27,9 @@ function valueChanged()
 <!--    dig autodiscover : <input type="checkbox" name="discover"> <br /> -->
     option +trace <input type="checkbox" id="trace" name="trace" value="trace" onchange="valueChanged()"/>
    <br />
-    <div id="server_field" >
+<!--    <div id="server_field" >
     dig sur un serveur précis : <input type="text" name="serveur"> <br /> 
-    </div>
+    </div>-->
     <br />
     <input type="submit" value="run">
 </form>
