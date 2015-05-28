@@ -75,7 +75,7 @@ def sortdom():
             if "." not in domain:
                 #pas de point = pas de domaine = osef
                 continue
-            domain = domain.strip().decode('utf8').encode('idna')
+            domain = domain.strip().encode('idna')
             domains_list.append(domain)
             sorted_doms['.'.join(domain.split('.')[1:]).strip()] = []
         for tld in sorted_doms.keys():
