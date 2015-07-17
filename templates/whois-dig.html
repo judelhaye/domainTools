@@ -70,10 +70,8 @@ function valueChanged()
             <li>{{ mx }} </li>
         {% endfor %}
         </ul>
-        {% if discover %}
             <strong>autodiscover</strong> : {{ res.discover  }}
             <br />
-        {% endif  %}
         <strong>TXT</strong> :
         {% for txt in res.TXT  %}
         {{ txt  }}

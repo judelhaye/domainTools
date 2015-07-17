@@ -1,6 +1,7 @@
 {% extends "base.html"  %}
 {% block index %}
 
+Renseignez 1 domaine par ligne : 
 <form  action="{{ url_for("sortdom") }}" method="post"> 
     <textarea rows="10" cols="80" name=domains></textarea>
     <br/>

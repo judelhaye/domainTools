@@ -1,14 +1,15 @@
 #!/usr/bin/python
 # coding: utf-8 
 
-from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
-from contextlib import closing
+from flask import Flask, request, url_for, render_template
 import socket
 import subprocess
+import dns.resolver
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+app.debug = True
 
 def whois_gtld(domain):
     p = subprocess.Popen(["whois",domain], stdout=subprocess.PIPE)
@@ -209,17 +210,39 @@ def get_cluster_ips(cluster):
     ips["CDN 17 POP"] = socket.gethostbyname('full-cdn-01.{}.ovh.net'.format(cluster)) 
     return ips 
 
+def rbl_check(ip):
+    bls = ["zen.spamhaus.org", 
+            "spam.abuse.ch", 
+            "cbl.abuseat.org", 
+            "virbl.dnsbl.bit.nl", 
+            "dnsbl.inps.de", 
+            "ix.dnsbl.manitu.net", 
+            "dnsbl.sorbs.net", 
+            "bl.spamcannibal.org", 
+            "bl.spamcop.net", 
+            "xbl.spamhaus.org", 
+            "pbl.spamhaus.org", 
+            "dnsbl-1.uceprotect.net", 
+            "dnsbl-2.uceprotect.net", 
+            "dnsbl-3.uceprotect.net", 
+            "db.wpbl.info"]
+    confirmed_bl = []
+    not_bl = []
+    for bl in bls:
+        try:
+            my_resolver = dns.resolver.Resolver()
+            query = '.'.join(reversed(str(ip).split("."))) + "." + bl
+            answers = my_resolver.query(query, "A")
+            answer_txt = my_resolver.query(query, "TXT")
+            ans = '{0} - {1}'.format(bl, answer_txt[0])
+            confirmed_bl.append(ans)
+        except dns.resolver.NXDOMAIN:
+            not_bl.append(bl)
+    return confirmed_bl, not_bl
+    
 @app.route("/")
 def index():
-    urls = {
-       'whois-dig':url_for('whois_dig'), 
-       'zonecheck':url_for('zonecheck'), 
-       'propadns':url_for('propadns'), 
-       'getip':url_for('getip'), 
-       'sortdom':url_for('sortdom'), 
-    }
-
-    return render_template('index.html', urls=urls)
+    return render_template('index.html')
 
 
 @app.route("/whois-dig", methods=['GET','POST'])
@@ -227,7 +250,7 @@ def whois_dig():
     serveur = ""
     trace=False
     dig_result = None
-    discover = True
+    discover = ""
     trace = False
     domain=""
     dig_to = ""
@@ -339,7 +362,34 @@ def sortdom():
                     sorted_doms[tld].append(dom)
     return render_template('sortdom.html', result=sorted_doms)
 
-    
+@app.route("/rbl", methods=['GET', 'POST'])
+def rbl():
+    res=[]
+    fail=[]
+    if request.method=='POST':
+        ip = request.form['ip']
+        res, fail = rbl_check(ip)
+    return render_template('rbl-check.html', result=res, failed=fail)
+
+
+@app.route('/mail_header', methods=['GET', 'POST'])
+def mail_header():
+    data = {}
+    if request.method == 'POST':
+        header = request.form['header']
+        head = header.split('\n')
+        for line in head : 
+            value = ""
+            if ":" in line : 
+                keyword = line.split(':')[0]  
+                values_array = line.split(':')[1:]
+                if len(values_array) > 1:
+                    value = " ".join(values_array)
+                else : 
+                    value = values_array[0]
+                data[keyword] = value 
+    return render_template('mail_header.html', result=data)
+
 
 if __name__=="__main__":
     app.run(host='0.0.0.0')

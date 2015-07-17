@@ -1,0 +1,26 @@
+{% extends "base.html"  %}
+{% block index %}
+
+header : 
+<form  action="{{ url_for("mail_header") }}" method="post"> 
+    <textarea rows="10" cols="80" name=header></textarea>
+    <br/>
+    <input type="submit" value="cleaner">
+</form>
+<hr />
+
+{% if result %}
+<table>
+<tbody>
+<tr>Header Name<th></th><th>Header Value</th></tr>
+    {% for key, value in result.iteritems()  %}
+    <tr>
+    <td>{{ key }}</td>
+    <td>{{ value }}</td>
+    </tr>
+    {% endfor %}
+{% endif %}
+</tbody>
+<table>
+{% endblock %}
+

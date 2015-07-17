@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 {% block index %}
-<ul>
-{% for label, dest in urls.iteritems() %}
-    <li><a href="{{ dest  }}"> {{ label }}</a></li>
-{% endfor %}
-</ul>
+<p>Petits outils de vérifications pour les domaines, les DNS et les ips de cluster.</p>
 {% endblock %}
 

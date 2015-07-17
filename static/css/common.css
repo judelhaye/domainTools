@@ -6,15 +6,17 @@ color: #333;
 background: #F0F0F0;
 }
 
-footer, a{
+a{
 color: #969696;    
 text-decoration: none;
 }
 
 h1 a{color: #333;}
 
-h3 a, 
 li a{
+color: #969696;    
+}
+h3 a{
 color: #333;    
 /*border-bottom: 1px solid #646464;*/
 }
@@ -39,3 +41,5 @@ td{
     padding: 5px;
    border: 1px solid black; 
 }
+
+width: 1px;height: 1px;transition: width 5s, height 5s;-webkit-transition: width 5s, height 5s;

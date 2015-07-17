@@ -1,0 +1,32 @@
+{% extends "base.html"  %}
+{% block index %}
+
+<form  action="{{ url_for("rbl") }}" method="post"> 
+    IP : <input name=ip />
+    <br/>
+    <input type="submit" value="check rbl">
+</form>
+<hr />
+
+{% if result %}
+<p>Blacklisted in : </p>
+{% autoescape false %}
+    <ul>
+    {% for res in result  %}
+    <li>{{ res }}</li>
+    {% endfor %}
+    </ul>
+{% endautoescape %}
+{% endif %}
+<hr />
+{% if failed %}
+<p>Not found in : </p>
+{% for fail in failed %}
+<ul>
+    <li>{{ fail }}</li>
+</ul>
+{% endfor %}
+{% endif %}
+
+{% endblock %}
+
