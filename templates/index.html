@@ -1,5 +1,20 @@
 {% extends "base.html" %}
 {% block index %}
-<p>Petits outils de vérifications pour les domaines, les DNS et les ips de cluster.</p>
+<p>Outils de vérification relatif aux domaines.</p>
+
+<ul>
+<li><strong>Dig + whois </strong> : dig automatique sur les champs A, MX, TXT, autodiscover 
+	et NS + parse des principaux whois</li>
+<li><strong>Zonecheck</strong> : lance une vérification de la zone DNS grace à l’outils 
+	zonemaster</li>
+<li><strong>Propagation</strong> : propagation DNS sur divers serveurs DNS à travers
+	le monde</li>
+<li><strong>Tri de domaine</strong> : Tri une liste de domaines par extensions</li>
+<li><strong>Ip Cluster OVH</strong> : permets de connaitre les différentes IP 
+	permettant d’accéder à un cluster</li>
+<li><strong>Check RBL</strong> : vérifie la présence d’une IP sur diverses RBL</li>
+<li><strong>Parse header mail</strong> : donnez lui un header, il vous le mets en 
+	forme dans un tableau</li>
+</ul>
 {% endblock %}
 
