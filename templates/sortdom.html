@@ -10,7 +10,7 @@ Renseignez 1 domaine par ligne :
 <hr />
 
 {% if result %}
-    {% for ext, dom in result.iteritems()  %}
+    {% for ext, dom in result.iteritems() | sort  %}
         <h3>{{ ext }}</h3>
         <ul>
         {% for d in dom  %}

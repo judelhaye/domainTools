@@ -345,7 +345,7 @@ def sortdom():
     sorted_doms = {}
     if request.method == 'POST':
         doms = request.form['domains']
-        domains = doms.split("\r\n")
+        domains = sorted(doms.split("\r\n"))
         # get all domains and tlds in the file
         extensions =[]
         domains_list=[]
