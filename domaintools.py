@@ -1,157 +1,39 @@
 #!/usr/bin/python
-# coding: utf-8 
+# coding: utf-8
 
 from flask import Flask, request, url_for, render_template
 import socket
 import subprocess
 import dns.resolver
-
+import whois_helper
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.debug = True
 
-def whois_gtld(domain):
-    p = subprocess.Popen(["whois",domain], stdout=subprocess.PIPE)
-    result = p.communicate()[0]
-    lines = result.decode('utf-8').split(u"\n")
-    datas = {}
-    for line in lines : 
-        if "Registrar:" in line and "Technical" not in line:
-            datas['registrar'] = line.split(":")[1]
-        if "Registrant Name:" in line : 
-            datas['owner'] = line.split(":")[1]
-        if "Domain Status:" in line :
-            if 'status' not in datas.keys():
-                datas['status'] = "".join(line.split(":")[1:])
-
-    return datas
-
-def whois_me(domain):
-    p = subprocess.Popen(["whois",domain], stdout=subprocess.PIPE)
-    result = p.communicate()[0]
-    lines = result.decode('utf-8').split(u"\n")
-    datas = {}
-    for line in lines : 
-        if "Sponsoring Registrar:" in line:
-            datas['registrar'] = line.split(":")[1]
-        if "Registrant Name" in line : 
-            datas['owner'] = line.split(":")[1]
-        if "Domain Status" in line :
-            datas['status'] = line.split(":")[1]
-
-    return datas
-
-def whois_fr(domain):
-    p = subprocess.Popen(["whois",domain], stdout=subprocess.PIPE)
-    result = p.communicate()[0]
-    lines = result.decode('utf-8').split(u"\n")
-    datas = {}
-    for line in lines : 
-        if "registrar:" in line:
-            datas['registrar'] = line.split(":")[1]
-        if "contact" in line : 
-            datas['owner'] = line.split(":")[1]
-        if "status" in line :
-            datas['status'] = line.split(":")[1]
-
-    return datas
-
-def whois_eu(domain):
-    p = subprocess.Popen(["whois",domain], stdout=subprocess.PIPE)
-    result = p.communicate()[0]
-    lines = result.decode('utf-8').split(u"\n")
-    datas = {}
-    for i, line in enumerate(lines):
-        # owner and status are not available on the whois, need to go to web based whois
-        datas['owner'] = "NOT DISCLOSED! Visit www.eurid.eu"
-        datas['status'] = "NOT DISCLOSED! Visit www.eurid.eu"
-        if "Registrar:" in line :
-            datas['registrar'] = lines[i+1].split(":")[1]
-    return datas
-
-def whois_uk(domain):
-    p = subprocess.Popen(["whois",domain], stdout=subprocess.PIPE)
-    result = p.communicate()[0]
-    lines = result.decode('utf-8').split(u"\n")
-    datas = {}
-    for i, line in enumerate(lines):
-        if "Registrant:" in line :
-            datas['owner'] =lines[i+1].strip()
-        if "Registrar" in line :
-             datas['registrar'] =lines[i+1].strip()
-        if "Data validation:" in line :
-            datas['status'] = lines[i+1].strip()
-    return datas
-
-def whois_be(domain):
-    p = subprocess.Popen(["whois",domain], stdout=subprocess.PIPE)
-    result = p.communicate()[0]
-    lines = result.decode('utf-8').split(u"\n")
-    datas = {}
-    for i, line in enumerate(lines):
-        if "Registrant:" in line :
-            datas['owner'] =lines[i+1].strip()
-        if "Registrar" in line  and "Technical" not in line :
-             datas['registrar'] =lines[i+1].split(":")[1].strip()
-        if "Status:" in line :
-            datas['status'] = line.split(":")[1].strip()
-    return datas
-
-
-def whois_ovh(domain):
-    p = subprocess.Popen(["whois", "-h", "whois.nic.ovh", domain], stdout=subprocess.PIPE)
-    result = p.communicate()[0]
-    lines = result.decode('utf-8').split(u"\n")
-    datas = {}
-    for i, line in enumerate(lines):
-        if "Registrant Name:" in line :
-            datas['owner'] =line.split(":")[1]
-        if "Sponsoring Registrar:" in line :
-             datas['registrar'] = line.split(":")[1]
-        if "Domain Status:" in line :
-            datas['status'] = line.split(":")[1]
-    return datas
-
-def whois_bzh(domain):
-    p = subprocess.Popen(["whois", "-h", "whois.nic.bzh", domain], stdout=subprocess.PIPE)
-    result = p.communicate()[0]
-    lines = result.decode('utf-8').split(u"\n")
-    datas = {}
-    for i, line in enumerate(lines):
-        if "Registrant Name:" in line :
-            datas['owner'] =line.split(":")[1]
-        if "Sponsoring Registrar:" in line :
-             datas['registrar'] = line.split(":")[1]
-        if "Domain Status:" in line :
-            datas['status'] = line.split(":")[1]
-    return datas
-
-
-
 def whois(domain):
     tld = domain.split(".")[-1]
     if tld == "com" or tld == "net" or tld == "org" or tld == "info":
-        result = whois_gtld(domain)
+        result = whois_helper.gtld(domain)
     elif tld == "fr" or tld == "re":
-        result = whois_fr(domain)
+        result = whois_helper.helper.fr(domain)
     elif tld == "eu":
-        result = whois_eu(domain)
+        result = whois_helper.eu(domain)
     elif tld == "uk":
-        result = whois_uk(domain)
+        result = whois_helper.uk(domain)
     elif tld == "me":
-        result = whois_me(domain)
+        result = whois_helper.me(domain)
     elif tld == "ovh":
-        result = whois_ovh(domain)
+        result = whois_helper.ovh(domain)
     elif tld == "bzh":
-        result = whois_bzh(domain)
+        result = whois_helper.bzh(domain)
     elif tld == "be":
-        result = whois_be(domain)
+        result = whois_helper.be(domain)
     else:
-        result = {'owner':"La recherche whois n'est pas (encore) gérée pour cette extension"}
-
+        result = {'owner':"La recherche whois n'est pas (encore) \
+                    gérée pour cette extension"}
     return result
-        
+
 
 def digger(dom, trace=False, field='A', exchange=True):
     res = {}
@@ -174,7 +56,7 @@ def digger(dom, trace=False, field='A', exchange=True):
                 host = socket.gethostbyaddr(dig_a_res)[0]
             except:
                 host = u"impossible de récupérer le nom d'hôte"
-        
+
         dig_ns_process = subprocess.Popen(["dig", dom, "NS", "+short"], stdout=subprocess.PIPE)
         dig_ns_res = dig_ns_process.communicate()[0][:-1]
 
@@ -202,29 +84,21 @@ def dig_on_server(dom, serv):
         res = "Le domaine n'est pas déclaré sur le serveur."
     return res
 
-def get_cluster_ips(cluster):
-    ips = {}
-    ips["directe sans cache"] = socket.gethostbyname('direct.{}.ovh.net'.format(cluster)) 
-    ips["ip classique"] = socket.gethostbyname('{}.ovh.net'.format(cluster)) 
-    ips["CDN 3 POP"] = socket.gethostbyname('basic-cdn-01.{}.ovh.net'.format(cluster)) 
-    ips["CDN 17 POP"] = socket.gethostbyname('full-cdn-01.{}.ovh.net'.format(cluster)) 
-    return ips 
-
 def rbl_check(ip):
-    bls = ["zen.spamhaus.org", 
-            "spam.abuse.ch", 
-            "cbl.abuseat.org", 
-            "virbl.dnsbl.bit.nl", 
-            "dnsbl.inps.de", 
-            "ix.dnsbl.manitu.net", 
-            "dnsbl.sorbs.net", 
-            "bl.spamcannibal.org", 
-            "bl.spamcop.net", 
-            "xbl.spamhaus.org", 
-            "pbl.spamhaus.org", 
-            "dnsbl-1.uceprotect.net", 
-            "dnsbl-2.uceprotect.net", 
-            "dnsbl-3.uceprotect.net", 
+    bls = ["zen.spamhaus.org",
+            "spam.abuse.ch",
+            "cbl.abuseat.org",
+            "virbl.dnsbl.bit.nl",
+            "dnsbl.inps.de",
+            "ix.dnsbl.manitu.net",
+            "dnsbl.sorbs.net",
+            "bl.spamcannibal.org",
+            "bl.spamcop.net",
+            "xbl.spamhaus.org",
+            "pbl.spamhaus.org",
+            "dnsbl-1.uceprotect.net",
+            "dnsbl-2.uceprotect.net",
+            "dnsbl-3.uceprotect.net",
             "db.wpbl.info"]
     confirmed_bl = []
     not_bl = []
@@ -239,7 +113,7 @@ def rbl_check(ip):
         except dns.resolver.NXDOMAIN:
             not_bl.append(bl)
     return confirmed_bl, not_bl
-    
+
 @app.route("/")
 def index():
     return render_template('index.html')
@@ -273,19 +147,6 @@ def whois_dig():
         whois_dom = whois(domain)
     return render_template('whois-dig.html', domain=domain, whois=whois_dom, dig_to=dig_to, res=dig_result, trace=trace, serv=serveur)
 
-@app.route('/zonecheck', methods=['GET','POST'])
-def zonecheck():
-    domain=""
-    res=""
-    if request.method == 'POST':
-        domain = request.form['domain'].strip().encode('idna')
-    
-        p = subprocess.Popen(["zonemaster-cli", domain], stdout=subprocess.PIPE)
-        result =  p.communicate()[0][:-1]
-        res = result
-
-    return render_template('zonemaster.html', domain=domain, res=res)
-    
 @app.route('/propadns', methods=['GET', 'POST'])
 def propadns():
     context = {}
@@ -295,7 +156,7 @@ def propadns():
         context['res'] = []
         domain = request.form['domain'].strip().encode('idna')
         context['domain'] = domain
-        servers = [ 
+        servers = [
             {"ip":"8.8.8.8", "localisation":"google (US)"},
             {"ip":"208.67.222.222", "localisation":"openDNS (US)"},
             {"ip":"8.26.56.26", "localisation":"comodo (US)"},
@@ -309,7 +170,7 @@ def propadns():
             {"ip":"84.200.69.80", "localisation":"DNS.WATCH (Allemagne)"},
             {"ip":"187.115.169.179","localisation":"Bresil"},
             {"ip":"211.22.80.180","localisation":"taiwan"},
-        ]   
+        ]
         for server in servers:
             if "ns_check" in request.form.keys():
                 p = subprocess.Popen(["dig", domain, "NS", "@{}".format(server["ip"]), "+short"], stdout=subprocess.PIPE)
@@ -326,19 +187,6 @@ def propadns():
     return render_template('propadns.html', res=res, domain=domain)
 
 
-@app.route('/getip', methods=['GET', 'POST'])
-def getip():
-    ips={}
-    cluster=""
-    if request.method == 'POST':
-        cluster = request.form['cluster']
-        ips = get_cluster_ips(cluster.split("-")[0].strip())
-        datas = { 
-            'cluster': cluster,
-            'ips': ips,
-        }   
-
-    return render_template('getip.html', ips=ips, cluster=cluster)
 
 @app.route('/sortdom', methods=['GET', 'POST'])
 def sortdom():
@@ -378,19 +226,18 @@ def mail_header():
     if request.method == 'POST':
         header = request.form['header']
         head = header.split('\n')
-        for line in head : 
+        for line in head :
             value = ""
-            if ":" in line : 
-                keyword = line.split(':')[0]  
+            if ":" in line :
+                keyword = line.split(':')[0]
                 values_array = line.split(':')[1:]
                 if len(values_array) > 1:
                     value = " ".join(values_array)
-                else : 
+                else :
                     value = values_array[0]
-                data[keyword] = value 
+                data[keyword] = value
     return render_template('mail_header.html', result=data)
 
 
 if __name__=="__main__":
     app.run(host='0.0.0.0')
-

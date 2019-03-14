@@ -4,10 +4,10 @@
        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/common.css') }}" />
    </head>
     <body>
-    
+
     <script src="{{ url_for('static', filename='js/konami.js') }}"></script>
     <script>
-        var easter_egg = new Konami(function() { 
+        var easter_egg = new Konami(function() {
             var img = document.createElement("img");
             img.src = "http://react.khrogosphe.re/dance_de_la_victoire.gif";
             var src = document.getElementById("konami");
@@ -17,17 +17,16 @@
         <h1><a href="https://domain-check.ovh">&#x2B22; Domain Check</a> </h1>
         <hr/>
         || <a href="{{ url_for('whois_dig') }}">Dig + whois</a>
-        || <a href="{{ url_for('zonecheck') }}">Zonecheck</a>
         || <a href="{{ url_for('propadns') }}">Propagation</a>
         || <a href="{{ url_for('sortdom') }}">tri de domaine</a>
         || <a href="{{ url_for('getip') }}">ip des clusters OVH</a>
         || <a href="{{ url_for('rbl') }}">Check RBL</a>
         || <a href="{{ url_for('mail_header') }}">parse header mail</a>
+        || <a href="{{ url_for('validate_mail') }}">validate mail list</a>
         || <hr/>
         {% block index %}{% endblock %}
         <div id="konami"></div>
         <hr/>
-	<p> Un bug ? faites la remontée sur <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#114;&#101;&#112;&#111;&#114;&#116;&#64;&#100;&#111;&#109;&#97;&#105;&#110;&#45;&#99;&#104;&#101;&#99;&#107;&#46;&#111;&#118;&#104;">&#114;&#101;&#112;&#111;&#114;&#116;&#64;&#100;&#111;&#109;&#97;&#105;&#110;&#45;&#99;&#104;&#101;&#99;&#107;&#46;&#111;&#118;&#104;</a></p>
+	<p> Un bug ? faites la remontÃ©e sur <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#114;&#101;&#112;&#111;&#114;&#116;&#64;&#100;&#111;&#109;&#97;&#105;&#110;&#45;&#99;&#104;&#101;&#99;&#107;&#46;&#111;&#118;&#104;">&#114;&#101;&#112;&#111;&#114;&#116;&#64;&#100;&#111;&#109;&#97;&#105;&#110;&#45;&#99;&#104;&#101;&#99;&#107;&#46;&#111;&#118;&#104;</a></p>
     </body>
 </html>
-
